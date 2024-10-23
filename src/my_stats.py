@@ -98,16 +98,13 @@ def apply_detrend_as_ufunc(
     '''
     
     if debug: print(func_kwargs)
-    if func_kwargs is not None:
-        func1d = partial(func1d, **func_kwargs)
+    if func_kwargs is not None: func1d = partial(func1d, **func_kwargs)
         
     
     ufunc_dict = dict(input_core_dims=[['time']], output_core_dims=[['time']], vectorize=True,
                       output_dtypes=float, dask='parallelized')
     
-    try:
-        # print(da)
-        to_return = xr.apply_ufunc(func1d, da, **ufunc_dict)
+    try: to_return = xr.apply_ufunc(func1d, da, **ufunc_dict)
     except ValueError as e:
         logger.debug(e)
         ufunc_dict.pop('output_dtypes')
@@ -161,7 +158,8 @@ def trend_fit(da:xr.DataArray, method:str=None, order:int=1, lowess_window:int=3
         func1d = partial(polynomial_fit, order=order)
 
     elif method == classes.detrendingMethods.LOWESS:
-        func1d = partial(lowess, exog=np.arange(len(da.time.values)), frac=lowess_window/len(da.time.values), return_sorted=False)
+        func1d = partial(lowess, exog=np.arange(len(da.time.values)), 
+                         frac=lowess_window/len(da.time.values), return_sorted=False)
     
     logger.debug(f'func1d = {func1d.func.__name__}\n{func1d}')
     da_trend = apply_detrend_as_ufunc(da, func1d, **func_kwargs)
