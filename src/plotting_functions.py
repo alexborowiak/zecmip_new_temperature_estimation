@@ -15,6 +15,8 @@ import constants
 
 from typing import NamedTuple
 
+
+
 class PlotConfig(NamedTuple):
     title_size = 20
     label_size = 16
